@@ -1,9 +1,18 @@
 import axios from 'axios';
 import { supabase } from '../context/AuthContext';
 
+const LOCAL_API_URL = 'http://localhost:5000/api';
+const PROD_API_URL = 'https://job-tracker-backend-uioe.onrender.com/api';
+
 const getBaseURL = () => {
   const envUrl = import.meta.env.VITE_API_URL;
-  if (!envUrl) return 'http://localhost:5000/api';
+  if (!envUrl) {
+    // Keep local development unchanged; use Render backend elsewhere.
+    if (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+      return LOCAL_API_URL;
+    }
+    return PROD_API_URL;
+  }
   const cleanUrl = envUrl.replace(/\/$/, '');
   return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
 };
